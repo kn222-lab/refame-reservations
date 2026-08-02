@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Reframe / 整体 予約</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        padding: 12px;
+        max-width: 100%;
+        margin: 0;
+        background-color: #f8fafc;
+        overflow-x: hidden;
+        color: #0f172a;
+      }
+
+      .title {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 12px;
+      }
+
+      .title span {
+        color: #2563eb;
+      }
+
+      .tab-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: bold;
+        border: 2px solid #e2e8f0;
+        background-color: white;
+        color: #64748b;
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      .tab-button.active {
+        border-color: #2563eb;
+        background-color: #eff6ff;
+        color: #2563eb;
+      }
+
+      /* 料金案内 */
+      .price-info {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #2563eb;
+        padding: 12px 14px;
+        border-radius: 8px;
+        margin: 16px 0 12px 0;
+      }
+
+      .price-badge {
+        font-size: 11px;
+        font-weight: bold;
+        color: #2563eb;
+        background-color: #eff6ff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 4px;
+      }
+
+      .price-detail {
+        font-size: 15px;
+        color: #0f172a;
+      }
+
+      .price-detail strong {
+        font-size: 18px;
+        color: #2563eb;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: bold;
+        color: #475569;
+        display: block;
+        margin-top: 12px;
+      }
+
+      select, input, button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+      }
+
+      button.submit-btn {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        margin-top: 20px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .slot {
+        padding: 16px;
+        margin: 8px 0;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .available {
+        background-color: #dbeafe;
+        color: #1e3a8a;
+      }
+
+      .full {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+      }
+
+      .selected {
+        border: 2px solid #2563eb;
+        background-color: #2563eb;
+        color: white;
+      }
+
+      .access-card {
+        background-color: white;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        margin-top: 24px;
+      }
+
+      .address {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+
+      .map-wrapper {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .map-wrapper iframe {
+        width: 100%;
+        height: 220px;
+        border: 0;
+        display: block;
+      }
+
+      .map-link {
+        display: block;
+        text-align: center;
+        background-color: #0f172a;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      @media (min-width: 768px) {
+        body {
+          max-width: 480px;
+          margin: auto;
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Reframe <span>/</span> 整体</h1>
+
+    <!-- 店舗切り替えタブ -->
+    <div class="tab-container">
+      <div id="tabZushi" class="tab-button active" onclick="switchLocation('逗子')">
+        逗子<br><small style="font-weight:normal; font-size:11px;">第1・3土曜</small>
+      </div>
+      <div id="tabYuigahama" class="tab-button" onclick="switchLocation('由比ヶ浜')">
+        由比ヶ浜<br><small style="font-weight:normal; font-size:11px;">第2・4土曜</small>
+      </div>
+    </div>
+
+    <!-- 料金案内 -->
+    <div class="price-info">
+      <span class="price-badge">施術メニュー</span>
+      <div class="price-detail">整体施術 60分 / <strong>8,000円</strong>（税込）</div>
+    </div>
+
+    <label>日付を選択</label>
+    <select id="dateSelect" onchange="loadSlots()"></select>
+
+    <label>時間を選択</label>
+    <div id="slots"></div>
+
+    <label>お客様情報</label>
+    <input type="text" id="name" placeholder="お名前（必須）">
+    <input type="email" id="email" placeholder="メールアドレス（任意）">
+
+    <button class="submit-btn" onclick="submitReservation()">予約を確定する</button>
+
+    <!-- アクセス情報 -->
+    <div class="access-card">
+      <h3 style="margin-top:0;" id="accessTitle">アクセス</h3>
+      <p class="address" id="accessDetail"></p>
+      <div class="map-wrapper" id="mapIframeWrapper"></div>
+      <a id="mapExternalLink" href="" target="_blank" class="map-link">
+        Googleマップで開く ↗
+      </a>
+    </div>
+
+    <script>
+      const slots = ["11:00", "12:15", "13:30", "14:45"];
+      let currentLocation = "逗子";
+      let selectedSlot = null;
+
+      const locationData = {
+        "逗子": {
+          title: "逗子院（カルチェット事務所）",
+          address: "〒249-0003 神奈川県逗子市池子2丁目14<br>京急線「神武寺駅」より徒歩",
+          mapIframe: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6511.92430006163!2d139.59297227621846!3d35.30692195044436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601846b8e745bbc9%3A0x766803d7995bfa6c!2z44Kr44Or44OB44Kn44OD44OI!5e0!3m2!1sja!2sjp!4v1775652736589!5m2!1sja!2sjp" loading="lazy"></iframe>',
+          mapUrl: "https://maps.app.goo.gl/5Mj34mHfNnxapJBMA"
+        },
+        "由比ヶ浜": {
+          title: "由比ヶ浜院（由比ヶ浜公会堂）",
+          address: "〒248-0014 神奈川県鎌倉市由比ガ浜2丁目20-3<br>江ノ電「和田塚駅」より徒歩<br>※駐輪場あり",
+          mapIframe: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3252.123456789!2d139.544!3d35.312!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601845c470123456%3A0x123456789abcdef!2z5pSx5L2B44Ks5rWc44K_44O844Oz44K_44O8!5e0!3m2!1sja!2sjp!4v1" loading="lazy"></iframe>',
+          mapUrl: "https://maps.google.com/?q=由比ヶ浜公会堂"
+        }
+      };
+
+      window.onload = function() {
+        initPage();
+      };
+
+      function initPage() {
+        updateAccessInfo();
+        fetch(`/api/dates?location=${encodeURIComponent(currentLocation)}`)
+          .then(res => res.json())
+          .then(dates => setDates(dates));
+      }
+
+      function switchLocation(location) {
+        if (currentLocation === location) return;
+        currentLocation = location;
+        selectedSlot = null;
+
+        document.getElementById("tabZushi").classList.toggle("active", location === "逗子");
+        document.getElementById("tabYuigahama").classList.toggle("active", location === "由比ヶ浜");
+
+        updateAccessInfo();
+        fetch(`/api/dates?location=${encodeURIComponent(currentLocation)}`)
+          .then(res => res.json())
+          .then(dates => setDates(dates));
+      }
+
+      function updateAccessInfo() {
+        const info = locationData[currentLocation];
+        document.getElementById("accessTitle").innerText = info.title;
+        document.getElementById("accessDetail").innerHTML = info.address;
+        document.getElementById("mapIframeWrapper").innerHTML = info.mapIframe;
+        document.getElementById("mapExternalLink").href = info.mapUrl;
+      }
+
+      function setDates(dates) {
+        const select = document.getElementById("dateSelect");
+        select.innerHTML = "";
+
+        if (dates.length === 0) {
+          const option = document.createElement("option");
+          option.text = "選択可能な日付がありません";
+          select.appendChild(option);
+          document.getElementById("slots").innerHTML = "";
+          return;
+        }
+
+        dates.forEach(date => {
+          const option = document.createElement("option");
+          option.value = date;
+          option.text = date.replaceAll('-', '/');
+          select.appendChild(option);
+        });
+
+        loadSlots();
+      }
+
+      function loadSlots() {
+        const date = document.getElementById("dateSelect").value;
+        if (!date) return;
+
+        fetch(`/api/booked-slots?location=${encodeURIComponent(currentLocation)}&date=${date}`)
+          .then(res => res.json())
+          .then(bookedSlots => {
+            const container = document.getElementById("slots");
+            container.innerHTML = "";
+
+            slots.forEach(slot => {
+              const div = document.createElement("div");
+              div.className = "slot";
+
+              const isBooked = bookedSlots.includes(slot);
+
+              if (isBooked) {
+                div.classList.add("full");
+                div.innerText = `× ${slot} (受付終了)`;
+              } else {
+                div.classList.add("available");
+                div.innerText = `○ ${slot}`;
+                if (selectedSlot === slot) div.classList.add("selected");
+                div.onclick = () => selectSlot(slot, div);
+              }
+
+              container.appendChild(div);
+            });
+          });
+      }
+
+      function selectSlot(slot, element) {
+        selectedSlot = slot;
+        document.querySelectorAll(".slot").forEach(el => el.classList.remove("selected"));
+        element.classList.add("selected");
+      }
+
+      function submitReservation() {
+        const date = document.getElementById("dateSelect").value;
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+
+        if (!selectedSlot || !name) {
+          alert("【店舗・日時】と【お名前】を正しく指定してください");
+          return;
+        }
+
+        if (!confirm(`${currentLocation}院\n${date} ${selectedSlot}\nお名前: ${name} 様\n\nこの内容で予約を確定しますか？`)) {
+          return;
+        }
+
+        const payload = {
+          locationName: currentLocation,
+          reservationDate: date,
+          slotTime: selectedSlot,
+          customerName: name,
+          customerEmail: email
+        };
+
+        fetch('/api/reserve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(res => {
+          alert(res.message);
+          selectedSlot = null;
+          loadSlots();
+        })
+        .catch(err => {
+          alert("エラーが発生しました");
+        });
+      }
+    </script>
+  </body>
+</html>

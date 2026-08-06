@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ご予約内容の確認 - Reframe</title>
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" th:href="@{/css/confirm.css}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card-header">
+        <h1>ご予約内容の確認</h1>
+    </div>
+
+    <div class="card-body">
+        <div th:if="${reservation != null}">
+            <table class="info-table">
+                <tr>
+                    <th>ステータス</th>
+                    <td>
+                        <span th:if="${reservation.status == 'BOOKED'}" class="status-badge status-booked">予約確定</span>
+                        <span th:if="${reservation.status == 'CANCELLED'}" class="status-badge status-cancelled">キャンセル済み</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>お名前</th>
+                    <td th:text="${reservation.customerName} + ' 様'"></td>
+                </tr>
+                <tr>
+                    <th>店舗</th>
+                    <td th:text="${reservation.locationName}"></td>
+                </tr>
+                <tr>
+                    <th>ご予約日時</th>
+                    <td th:text="${#temporals.format(reservation.reservedDate, 'yyyy年M月d日')} + ' ' + ${reservation.timeSlot} + '〜'"></td>
+                </tr>
+                <tr>
+                    <th>コース</th>
+                    <td>整体 ＋ セルフケア指導コース (60分)</td>
+                </tr>
+            </table>
+
+            <!-- 予約状態（BOOKED）のときだけキャンセルボタンを表示 -->
+            <div th:if="${reservation.status == 'BOOKED'}">
+                <form th:action="@{/reservation/cancel}" method="post" onsubmit="return confirm('本当に予約をキャンセルしますか？');">
+                    <input type="hidden" name="code" th:value="${reservation.reservationCode}" />
+                    <button type="submit" class="btn-cancel">この予約をキャンセルする</button>
+                </form>
+            </div>
+
+            <!-- キャンセル済みのメッセージ -->
+            <div th:if="${reservation.status == 'CANCELLED'}" class="message-box message-cancelled">
+                このご予約はすでにキャンセル処理が完了しています。
+            </div>
+        </div>
+
+        <!-- エラーメッセージ -->
+        <div th:if="${reservation == null}" class="message-box message-error">
+            該当するご予約情報が見つかりませんでした。
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

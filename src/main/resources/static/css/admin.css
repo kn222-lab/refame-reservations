@@ -1,0 +1,17 @@
+* { box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
+    body { margin: 0; padding: 20px; background-color: #f5f7fa; color: #333; }
+    .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { margin-top: 0; font-size: 24px; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; color: #2b6cb0; }
+    .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+    .filter-bar label { font-weight: bold; }
+    .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+    th { background-color: #edf2f7; font-weight: bold; }
+    tr:nth-child(even) { background-color: #f7fafc; }
+    .status-booked { color: #2b6cb0; font-weight: bold; }
+    .status-cancelled { color: #e53e3e; font-weight: bold; text-decoration: line-through; }
+    .btn-cancel { background-color: #e53e3e; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    .btn-cancel:hover { background-color: #c53030; }
+    .btn-cancel:disabled { background-color: #cbd5e0; cursor: not-allowed; }
+    .no-data { text-align: center; color: #718096; padding: 20px; }

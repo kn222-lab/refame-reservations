@@ -1,380 +1,358 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<html lang="ja">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Reframe / 整体 予約</title>
-    <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        padding: 12px;
-        max-width: 100%;
-        margin: 0;
-        background-color: #f8fafc;
-        overflow-x: hidden;
-        color: #0f172a;
-      }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reframe | WEB予約</title>
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body>
 
-      .title {
-        font-size: 28px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 12px;
-      }
-
-      .title span {
-        color: #2563eb;
-      }
-
-      .tab-container {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-      }
-
-      .tab-button {
-        flex: 1;
-        padding: 12px;
-        font-size: 15px;
-        font-weight: bold;
-        border: 2px solid #e2e8f0;
-        background-color: white;
-        color: #64748b;
-        border-radius: 10px;
-        cursor: pointer;
-        text-align: center;
-      }
-
-      .tab-button.active {
-        border-color: #2563eb;
-        background-color: #eff6ff;
-        color: #2563eb;
-      }
-
-      /* 料金案内 */
-      .price-info {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-left: 4px solid #2563eb;
-        padding: 12px 14px;
-        border-radius: 8px;
-        margin: 16px 0 12px 0;
-      }
-
-      .price-badge {
-        font-size: 11px;
-        font-weight: bold;
-        color: #2563eb;
-        background-color: #eff6ff;
-        padding: 2px 6px;
-        border-radius: 4px;
-        display: inline-block;
-        margin-bottom: 4px;
-      }
-
-      .price-detail {
-        font-size: 15px;
-        color: #0f172a;
-      }
-
-      .price-detail strong {
-        font-size: 18px;
-        color: #2563eb;
-      }
-
-      label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #475569;
-        display: block;
-        margin-top: 12px;
-      }
-
-      select, input, button {
-        width: 100%;
-        padding: 14px;
-        margin-top: 6px;
-        font-size: 16px;
-        box-sizing: border-box;
-        border-radius: 10px;
-        border: 1px solid #cbd5e1;
-      }
-
-      button.submit-btn {
-        background-color: #2563eb;
-        color: white;
-        border: none;
-        margin-top: 20px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .slot {
-        padding: 16px;
-        margin: 8px 0;
-        border-radius: 10px;
-        text-align: center;
-        font-weight: 600;
-        cursor: pointer;
-      }
-
-      .available {
-        background-color: #dbeafe;
-        color: #1e3a8a;
-      }
-
-      .full {
-        background-color: #f1f5f9;
-        color: #94a3b8;
-        cursor: not-allowed;
-      }
-
-      .selected {
-        border: 2px solid #2563eb;
-        background-color: #2563eb;
-        color: white;
-      }
-
-      .access-card {
-        background-color: white;
-        padding: 16px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        margin-top: 24px;
-      }
-
-      .address {
-        font-size: 14px;
-        color: #475569;
-        line-height: 1.6;
-        margin-bottom: 12px;
-      }
-
-      .map-wrapper {
-        width: 100%;
-        overflow: hidden;
-        border-radius: 8px;
-      }
-
-      .map-wrapper iframe {
-        width: 100%;
-        height: 220px;
-        border: 0;
-        display: block;
-      }
-
-      .map-link {
-        display: block;
-        text-align: center;
-        background-color: #0f172a;
-        color: white;
-        padding: 12px;
-        border-radius: 8px;
-        margin-top: 10px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-      }
-
-      @media (min-width: 768px) {
-        body {
-          max-width: 480px;
-          margin: auto;
-          padding: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <h1 class="title">Reframe <span>/</span> 整体</h1>
-
-    <!-- 店舗切り替えタブ -->
-    <div class="tab-container">
-      <div id="tabZushi" class="tab-button active" onclick="switchLocation('逗子')">
-        逗子<br><small style="font-weight:normal; font-size:11px;">第1・3土曜</small>
-      </div>
-      <div id="tabYuigahama" class="tab-button" onclick="switchLocation('由比ヶ浜')">
-        由比ヶ浜<br><small style="font-weight:normal; font-size:11px;">第2・4土曜</small>
-      </div>
+    <div class="header">
+        <h1>Reframe <span class="slash">/</span> 整体</h1>
+        <p>24時間 WEB予約システム</p>
     </div>
 
-    <!-- 料金案内 -->
-    <div class="price-info">
-      <span class="price-badge">施術メニュー</span>
-      <div class="price-detail">整体施術 60分 / <strong>8,000円</strong>（税込）</div>
+
+    <!-- STEP 0: 施術メニュー・コンパクト紹介 -->
+    <div class="section" style="background: #ffffff; padding: 16px;">
+        <!-- ヘッダー：タイトルと金額を横並びでスッキリ -->
+        <div class="menu-header-compact">
+            <div>
+                <div class="menu-title-compact">整体 ＋ セルフケア指導コース</div>
+                <div class="menu-sub-compact">カウンセリング・施術・運動指導まで含んだオールインワン</div>
+            </div>
+            <div class="menu-price-compact">
+                ¥8,000 <span class="tax-compact">(税込) / 60分</span>
+            </div>
+        </div>
+
+        <!-- 流れ：横並びのコンパクトカード -->
+        <div class="flow-container-compact">
+            <!-- STEP 1 -->
+            <div class="flow-item-compact">
+                <div class="flow-head-compact">
+                    <span class="flow-badge-compact">STEP 1</span>
+                    <span class="flow-name-compact">カウンセリング・評価</span>
+                </div>
+                <div class="flow-desc-compact">お悩みや体の癖をヒアリングし、可動域や姿勢を検査します。</div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="flow-item-compact">
+                <div class="flow-head-compact">
+                    <span class="flow-badge-compact">STEP 2</span>
+                    <span class="flow-name-compact">オーダーメイド整体</span>
+                </div>
+                <div class="flow-desc-compact">筋肉を緩め関節を整え、歪みや痛みの根本にアプローチ。</div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="flow-item-compact">
+                <div class="flow-head-compact">
+                    <span class="flow-badge-compact">STEP 3</span>
+                    <span class="flow-name-compact">セルフケア指導</span>
+                </div>
+                <div class="flow-desc-compact">状態キープのためのストレッチや運動をレクチャー。</div>
+            </div>
+        </div>
     </div>
 
-    <label>日付を選択</label>
-    <select id="dateSelect" onchange="loadSlots()"></select>
+    <div class="container">
+        <!-- STEP 1: 店舗選択 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="step-badge">1</span> 店舗を選択
+            </div>
+            <div class="grid-2">
+                <div class="card-option active" onclick="selectLocation('逗子', this)">
+                    <div class="store-name">逗子</div>
+                    <span class="sub">神武寺駅 徒歩5分<br>駐車場 1台有</span>
+                </div>
+                <div class="card-option" onclick="selectLocation('由比ヶ浜', this)">
+                    <div class="store-name">由比ヶ浜</div>
+                    <span class="sub">和田塚駅 2分<br>駐輪場有</span>
+                </div>
+            </div>
 
-    <label>時間を選択</label>
-    <div id="slots"></div>
+            <!-- 地図埋め込みエリア -->
+            <div class="map-container">
+                <!-- 逗子マップ（初期表示） -->
+                <iframe id="mapZushi" class="map-frame active" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3255.976739230603!2d139.59164062411367!3d35.30655945046771!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601846b8e745bbc9%3A0x766803d7995bfa6c!2z44Kr44Or44OB44Kn44OD44OI!5e0!3m2!1sja!2sjp!4v1785653725966!5m2!1sja!2sjp" 
+                    allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                <!-- 由比ヶ浜マップ -->
+                <iframe id="mapYuigahama" class="map-frame" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1627.8228546203468!2d139.5452134288769!3d35.314783804247824!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601845e8518b9da9%3A0xb6d1c51d92ff9065!2z6Y6M5YCJ5biCIOeUseavlOOCrOa1nOWFrOS8muWggg!5e0!3m2!1sja!2sjp!4v1785653907979!5m2!1sja!2sjp" 
+                    allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe> 
+            </div>
+        </div>
 
-    <label>お客様情報</label>
-    <input type="text" id="name" placeholder="お名前（必須）">
-    <input type="email" id="email" placeholder="メールアドレス（任意）">
+        <!-- STEP 2: 日付・時間選択 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="step-badge">2</span> 日時を選択
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 13px; color: var(--gray); display: block; margin-bottom: 5px;">予約希望日</label>
+                <select id="dateSelect" onchange="onDateChanged()">
+                    <option value="">店舗を選択してください</option>
+                </select>
+            </div>
 
-    <button class="submit-btn" onclick="submitReservation()">予約を確定する</button>
+            <div>
+                <label style="font-size: 13px; color: var(--gray); display: block; margin-bottom: 5px;">時間枠</label>
+                <div id="slotGrid" class="slot-grid">
+                    <div style="grid-column: span 2; text-align: center; color: var(--gray); font-size: 13px; padding: 15px;">
+                        日付を選択すると時間枠が表示されます
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- アクセス情報 -->
-    <div class="access-card">
-      <h3 style="margin-top:0;" id="accessTitle">アクセス</h3>
-      <p class="address" id="accessDetail"></p>
-      <div class="map-wrapper" id="mapIframeWrapper"></div>
-      <a id="mapExternalLink" href="" target="_blank" class="map-link">
-        Googleマップで開く ↗
-      </a>
+        <!-- STEP 3: お客様情報 -->
+        <div class="section">
+            <div class="section-title">
+                <span class="step-badge">3</span> お客様情報を入力
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 13px; color: var(--gray); display: block; margin-bottom: 5px;">お名前 <span style="color: var(--danger)">*</span></label>
+                <input type="text" id="customerName" placeholder="例）山田 太郎" oninput="validateForm()">
+            </div>
+
+            <div>
+                <label style="font-size: 13px; color: var(--gray); display: block; margin-bottom: 5px;">メールアドレス（確認メール用）</label>
+                <input type="email" id="customerEmail" placeholder="example@email.com">
+            </div>
+        </div>
+
+        <!-- 予約ボタン -->
+        <button id="submitBtn" class="submit-btn" disabled onclick="openConfirmModal()">
+            予約内容を確認する
+        </button>
+    </div>
+
+    <!-- 確認モーダル -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">予約内容の確認</div>
+            <table class="confirm-table">
+                <tr><th>店舗</th><td id="modalLocation">-</td></tr>
+                <tr><th>日時</th><td id="modalDateTime">-</td></tr>
+                <tr><th>お名前</th><td id="modalName">-</td></tr>
+                <tr><th>メール</th><td id="modalEmail">-</td></tr>
+            </table>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeConfirmModal()">修正する</button>
+                <button class="btn-primary" onclick="submitReservation()">予約を確定する</button>
+            </div>
+        </div>
     </div>
 
     <script>
-      const slots = ["11:00", "12:15", "13:30", "14:45"];
-      let currentLocation = "逗子";
-      let selectedSlot = null;
+        let selectedLocation = '逗子';
+        let selectedDate = '';
+        let selectedTimeSlot = '';
 
-      const locationData = {
-        "逗子": {
-          title: "逗子院（カルチェット事務所）",
-          address: "〒249-0003 神奈川県逗子市池子2丁目14<br>京急線「神武寺駅」より徒歩",
-          mapIframe: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6511.92430006163!2d139.59297227621846!3d35.30692195044436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601846b8e745bbc9%3A0x766803d7995bfa6c!2z44Kr44Or44OB44Kn44OD44OI!5e0!3m2!1sja!2sjp!4v1775652736589!5m2!1sja!2sjp" loading="lazy"></iframe>',
-          mapUrl: "https://maps.app.goo.gl/5Mj34mHfNnxapJBMA"
-        },
-        "由比ヶ浜": {
-          title: "由比ヶ浜院（由比ヶ浜公会堂）",
-          address: "〒248-0014 神奈川県鎌倉市由比ガ浜2丁目20-3<br>江ノ電「和田塚駅」より徒歩<br>※駐輪場あり",
-          mapIframe: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3252.123456789!2d139.544!3d35.312!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601845c470123456%3A0x123456789abcdef!2z5pSx5L2B44Ks5rWc44K_44O844Oz44K_44O8!5e0!3m2!1sja!2sjp!4v1" loading="lazy"></iframe>',
-          mapUrl: "https://maps.google.com/?q=由比ヶ浜公会堂"
-        }
-      };
+        const ALL_SLOTS = ["11:00", "12:15", "13:30", "14:45"];
 
-      window.onload = function() {
-        initPage();
-      };
-
-      function initPage() {
-        updateAccessInfo();
-        fetch(`/api/dates?location=${encodeURIComponent(currentLocation)}`)
-          .then(res => res.json())
-          .then(dates => setDates(dates));
-      }
-
-      function switchLocation(location) {
-        if (currentLocation === location) return;
-        currentLocation = location;
-        selectedSlot = null;
-
-        document.getElementById("tabZushi").classList.toggle("active", location === "逗子");
-        document.getElementById("tabYuigahama").classList.toggle("active", location === "由比ヶ浜");
-
-        updateAccessInfo();
-        fetch(`/api/dates?location=${encodeURIComponent(currentLocation)}`)
-          .then(res => res.json())
-          .then(dates => setDates(dates));
-      }
-
-      function updateAccessInfo() {
-        const info = locationData[currentLocation];
-        document.getElementById("accessTitle").innerText = info.title;
-        document.getElementById("accessDetail").innerHTML = info.address;
-        document.getElementById("mapIframeWrapper").innerHTML = info.mapIframe;
-        document.getElementById("mapExternalLink").href = info.mapUrl;
-      }
-
-      function setDates(dates) {
-        const select = document.getElementById("dateSelect");
-        select.innerHTML = "";
-
-        if (dates.length === 0) {
-          const option = document.createElement("option");
-          option.text = "選択可能な日付がありません";
-          select.appendChild(option);
-          document.getElementById("slots").innerHTML = "";
-          return;
-        }
-
-        dates.forEach(date => {
-          const option = document.createElement("option");
-          option.value = date;
-          option.text = date.replaceAll('-', '/');
-          select.appendChild(option);
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDates('逗子');
         });
 
-        loadSlots();
-      }
+        // 店舗切り替え
+        function selectLocation(locationName, element) {
+            document.querySelectorAll('.card-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
 
-      function loadSlots() {
-        const date = document.getElementById("dateSelect").value;
-        if (!date) return;
+            selectedLocation = locationName;
+            selectedDate = '';
+            selectedTimeSlot = '';
+            
+            fetchDates(locationName);
+            resetSlotsUI();
+            validateForm();
+        }
 
-        fetch(`/api/booked-slots?location=${encodeURIComponent(currentLocation)}&date=${date}`)
-          .then(res => res.json())
-          .then(bookedSlots => {
-            const container = document.getElementById("slots");
-            container.innerHTML = "";
+        // 日付一覧取得
+        async function fetchDates(locationName) {
+            const dateSelect = document.getElementById('dateSelect');
+            dateSelect.innerHTML = '<option value="">読み込み中...</option>';
 
-            slots.forEach(slot => {
-              const div = document.createElement("div");
-              div.className = "slot";
+            try {
+                const res = await fetch(`/api/dates?location=${encodeURIComponent(locationName)}`);
+                const dates = await res.json();
 
-              const isBooked = bookedSlots.includes(slot);
+                dateSelect.innerHTML = '<option value="">日付を選択してください</option>';
+                dates.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = `${d} (土)`;
+                    dateSelect.appendChild(opt);
+                });
+            } catch (e) {
+                dateSelect.innerHTML = '<option value="">日付の取得に失敗しました</option>';
+            }
+        }
 
-              if (isBooked) {
-                div.classList.add("full");
-                div.innerText = `× ${slot} (受付終了)`;
-              } else {
-                div.classList.add("available");
-                div.innerText = `○ ${slot}`;
-                if (selectedSlot === slot) div.classList.add("selected");
-                div.onclick = () => selectSlot(slot, div);
-              }
+        // 日付変更時
+        async function onDateChanged() {
+            selectedDate = document.getElementById('dateSelect').value;
+            selectedTimeSlot = '';
+            validateForm();
 
-              container.appendChild(div);
+            if (!selectedDate) {
+                resetSlotsUI();
+                return;
+            }
+
+            // 埋まっている枠を取得して描画
+            try {
+                const res = await fetch(`/api/booked-slots?location=${encodeURIComponent(selectedLocation)}&date=${selectedDate}`);
+                const bookedSlots = await res.json();
+                renderSlots(bookedSlots);
+            } catch (e) {
+                console.error("予約済み枠の取得に失敗しました", e);
+            }
+        }
+
+        // 時間枠UIの描画
+        function renderSlots(bookedSlots) {
+            const grid = document.getElementById('slotGrid');
+            grid.innerHTML = '';
+
+            ALL_SLOTS.forEach(slot => {
+                const isBooked = bookedSlots.includes(slot);
+                const btn = document.createElement('div');
+                
+                btn.className = `slot-btn ${isBooked ? 'booked' : 'available'}`;
+                btn.innerHTML = `
+                    <span class="slot-time">${slot}</span>
+                    <span class="slot-status">${isBooked ? '× 予約不可' : '○ 予約可'}</span>
+                `;
+
+                if (!isBooked) {
+                    btn.onclick = () => {
+                        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedTimeSlot = slot;
+                        validateForm();
+                    };
+                }
+
+                grid.appendChild(btn);
             });
-          });
-      }
-
-      function selectSlot(slot, element) {
-        selectedSlot = slot;
-        document.querySelectorAll(".slot").forEach(el => el.classList.remove("selected"));
-        element.classList.add("selected");
-      }
-
-      function submitReservation() {
-        const date = document.getElementById("dateSelect").value;
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-
-        if (!selectedSlot || !name) {
-          alert("【店舗・日時】と【お名前】を正しく指定してください");
-          return;
         }
 
-        if (!confirm(`${currentLocation}院\n${date} ${selectedSlot}\nお名前: ${name} 様\n\nこの内容で予約を確定しますか？`)) {
-          return;
+        function resetSlotsUI() {
+            const grid = document.getElementById('slotGrid');
+            grid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: var(--gray); font-size: 13px; padding: 15px;">日付を選択すると時間枠が表示されます</div>';
         }
 
-        const payload = {
-          locationName: currentLocation,
-          reservationDate: date,
-          slotTime: selectedSlot,
-          customerName: name,
-          customerEmail: email
-        };
+        // フォーム入力チェック（必須項目が揃ったらボタン有効化）
+        function validateForm() {
+            const name = document.getElementById('customerName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
 
-        fetch('/api/reserve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(res => {
-          alert(res.message);
-          selectedSlot = null;
-          loadSlots();
-        })
-        .catch(err => {
-          alert("エラーが発生しました");
-        });
-      }
+            if (selectedLocation && selectedDate && selectedTimeSlot && name) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        // 確認モーダル開閉
+        function openConfirmModal() {
+            document.getElementById('modalLocation').textContent = `${selectedLocation}院`;
+            document.getElementById('modalDateTime').textContent = `${selectedDate} (土)${selectedTimeSlot}~`;
+            document.getElementById('modalName').textContent = document.getElementById('customerName').value;
+            document.getElementById('modalEmail').textContent = document.getElementById('customerEmail').value || '未入力';
+
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        // 予約確定API実行
+        async function submitReservation() {
+            const payload = {
+                location: selectedLocation,
+                date: selectedDate,
+                timeSlot: selectedTimeSlot,
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value
+            };
+
+            closeConfirmModal();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '処理中...';
+
+            try {
+                const res = await fetch('/api/reserve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    showSuccessScreen();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || '予約に失敗しました。');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '予約内容を確認する';
+                }
+            } catch (e) {
+                alert('通信エラーが発生しました。');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '予約内容を確認する';
+            }
+        }
+
+        // 完了画面の表示
+        function showSuccessScreen() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="section success-box">
+                    <div class="success-icon">✓</div>
+                    <h2 style="margin: 0 0 10px; color: var(--primary);">ご予約が完了しました</h2>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        ご登録いただいたメールアドレス宛に確認メールを送信いたしました。<br>
+                        当日のご来店を心よりお待ちしております。
+                    </p>
+                    <button class="submit-btn" onclick="location.reload()">トップに戻る</button>
+                </div>
+            `;
+        }
+
+        // JavaScript内の selectLocation 関数を修正
+        function selectLocation(locationName, element) {
+            document.querySelectorAll('.card-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // ★ 地図の切り替え処理を追加
+            document.querySelectorAll('.map-frame').forEach(frame => frame.classList.remove('active'));
+            if (locationName === '逗子') {
+                document.getElementById('mapZushi').classList.add('active');
+            } else {
+                document.getElementById('mapYuigahama').classList.add('active');
+            }
+
+            selectedLocation = locationName;
+            selectedDate = '';
+            selectedTimeSlot = '';
+            
+            fetchDates(locationName);
+            resetSlotsUI();
+            validateForm();
+        }
     </script>
-  </body>
+</body>
 </html>

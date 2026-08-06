@@ -6,20 +6,17 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    List<Reservation> findByLocationNameAndReservationDateAndStatus(
-        String locationName, 
-        LocalDate reservationDate, 
-        String status
-    );
+    List<Reservation> findByLocation_NameAndReservedDateAndStatus(
+            String locationName, LocalDate reservedDate, String status);
 
-    boolean existsByLocationNameAndReservationDateAndSlotTimeAndStatus(
-        String locationName, 
-        LocalDate reservationDate, 
-        String slotTime, 
-        String status
-    );
+    boolean existsByLocation_NameAndReservedDateAndTimeSlotAndStatus(
+            String locationName, LocalDate reservedDate, String timeSlot, String status);
+
+    // ★今回追加するメソッド（予約コードによる1件検索）
+    Optional<Reservation> findByReservationCode(String reservationCode);
 }

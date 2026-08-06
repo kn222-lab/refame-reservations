@@ -1,6 +1,8 @@
 package com.example.reframe.service;
 
+import com.example.reframe.entity.Location;
 import com.example.reframe.entity.Reservation;
+import com.example.reframe.repository.LocationRepository;
 import com.example.reframe.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,18 +20,15 @@ public class ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    // 固定枠の定義
+    @Autowired
+    private LocationRepository locationRepository;
+
     public static final List<String> ALL_SLOTS = Arrays.asList("11:00", "12:15", "13:30", "14:45");
 
-    /**
-     * 店舗に応じた対象土曜日の日付一覧を取得
-     * 逗子: 第1・3土曜 / 由比ヶ浜: 第2・4土曜
-     */
     public List<LocalDate> getAvailableDates(String locationName) {
         List<LocalDate> dates = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
-        // 当月と翌月を対象
         YearMonth currentMonth = YearMonth.from(today);
         List<YearMonth> targetMonths = Arrays.asList(currentMonth, currentMonth.plusMonths(1));
 
@@ -43,7 +42,6 @@ public class ReservationService {
                 if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
                     int weekOfMonth = (day - 1) / 7 + 1;
                     if (targetWeeks.contains(weekOfMonth)) {
-                        // 過去日は除外
                         if (!date.isBefore(today)) {
                             dates.add(date);
                         }
@@ -54,37 +52,62 @@ public class ReservationService {
         return dates;
     }
 
-    /**
-     * 指定店舗・日付で予約済みの時間枠一覧を取得
-     */
     public List<String> getBookedSlots(String locationName, LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findByLocationNameAndReservationDateAndStatus(
-                locationName, date, "予約");
+        List<Reservation> reservations = reservationRepository.findByLocation_NameAndReservedDateAndStatus(
+                locationName, date, "BOOKED");
         
         List<String> bookedSlots = new ArrayList<>();
         for (Reservation r : reservations) {
-            bookedSlots.add(r.getSlotTime());
+            bookedSlots.add(r.getTimeSlot());
         }
         return bookedSlots;
     }
 
-    /**
-     * 予約登録処理
-     */
-    public boolean createReservation(Reservation reservation) {
-        // 重複チェック
-        boolean exists = reservationRepository.existsByLocationNameAndReservationDateAndSlotTimeAndStatus(
-                reservation.getLocationName(),
-                reservation.getReservationDate(),
-                reservation.getSlotTime(),
-                "予約"
+    public boolean createReservation(Reservation reservation, String locationName) {
+        boolean exists = reservationRepository.existsByLocation_NameAndReservedDateAndTimeSlotAndStatus(
+                locationName,
+                reservation.getReservedDate(),
+                reservation.getTimeSlot(),
+                "BOOKED"
         );
 
         if (exists) {
-            return false; // 重複あり
+            return false;
         }
+
+        Location location = locationRepository.findByName(locationName)
+                .orElseThrow(() -> new IllegalArgumentException("指定された店舗が存在しません: " + locationName));
+        
+        reservation.setLocation(location);
 
         reservationRepository.save(reservation);
         return true;
+    }
+
+    /**
+     * 管理者用: 条件に応じた予約一覧の取得
+     */
+    public List<Reservation> getAdminReservations(String locationName, String dateStr) {
+        if ("すべて".equals(locationName) && (dateStr == null || dateStr.isBlank())) {
+            return reservationRepository.findAll();
+        }
+
+        // 全件からメモリ上で簡易フィルタリング（件数が少ないフェーズ1で最適）
+        return reservationRepository.findAll().stream()
+                .filter(r -> "すべて".equals(locationName) || r.getLocationName().equals(locationName))
+                .filter(r -> dateStr == null || dateStr.isBlank() || r.getReservedDate().toString().equals(dateStr))
+                .sorted((a, b) -> b.getReservedDate().compareTo(a.getReservedDate()))
+                .toList();
+    }
+
+    /**
+     * 管理者用: 予約のキャンセル処理
+     */
+    public boolean cancelReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId).map(reservation -> {
+            reservation.setStatus("CANCELLED");
+            reservationRepository.save(reservation);
+            return true;
+        }).orElse(false);
     }
 }

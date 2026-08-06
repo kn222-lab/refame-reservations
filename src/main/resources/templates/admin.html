@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reframe 予約管理システム - 管理画面</title>
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Reframe 予約管理ダッシュボード</h1>
+        
+        <div class="filter-bar">
+            <label for="locationFilter">店舗:</label>
+            <select id="locationFilter" onchange="loadReservations()">
+                <option value="すべて">すべて</option>
+                <option value="逗子">逗子</option>
+                <option value="由比ヶ浜">由比ヶ浜</option>
+            </select>
+
+            <label for="dateFilter">日付:</label>
+            <input type="date" id="dateFilter" onchange="loadReservations()">
+
+            <button onclick="resetFilters()" style="padding: 8px 12px; cursor: pointer;">クリア</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>店舗</th>
+                    <th>予約日時</th>
+                    <th>お客様名</th>
+                    <th>メールアドレス</th>
+                    <th>ステータス</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="reservationTableBody">
+                <!-- JavaScriptで動的生成 -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadReservations() {
+            const location = document.getElementById('locationFilter').value;
+            const date = document.getElementById('dateFilter').value;
+
+            let url = `/api/admin/reservations?location=${encodeURIComponent(location)}`;
+            if (date) {
+                url += `&date=${date}`;
+            }
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                renderTable(data);
+            } catch (err) {
+                console.error('予約一覧の取得に失敗しました', err);
+            }
+        }
+
+        function renderTable(reservations) {
+            const tbody = document.getElementById('reservationTableBody');
+            tbody.innerHTML = '';
+
+            if (!reservations || reservations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">該当する予約情報がありません。</td></tr>';
+                return;
+            }
+
+            reservations.forEach(r => {
+                const tr = document.createElement('tr');
+                const isBooked = r.status === 'BOOKED';
+
+                tr.innerHTML = `
+                    <td>${r.id}</td>
+                    <td>${r.locationName}</td>
+                    <td>${r.reservedDate}${r.timeSlot}</td>
+                    <td>${r.customerName}</td>
+                    <td>${r.customerEmail || '-'}</td>
+                    <td class="${isBooked ? 'status-booked' : 'status-cancelled'}">
+                        ${isBooked ? '予約中' : 'キャンセル済'}
+                    </td>
+                    <td>
+                        ${isBooked 
+                            ? `<button class="btn-cancel" onclick="cancelReservation(${r.id})">キャンセル</button>` 
+                            : '-'
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function cancelReservation(id) {
+            if (!confirm(`ID: ${id} の予約をキャンセルしてもよろしいですか？`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/admin/reservations/${id}/cancel`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    alert('予約をキャンセルしました');
+                    loadReservations();
+                } else {
+                    const errText = await res.text();
+                    alert('キャンセルの処理に失敗しました: ' + errText);
+                }
+            } catch (err) {
+                alert('通信エラーが発生しました');
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('locationFilter').value = 'すべて';
+            document.getElementById('dateFilter').value = '';
+            loadReservations();
+        }
+
+        // 初期表示
+        loadReservations();
+    </script>
+</body>
+</html>

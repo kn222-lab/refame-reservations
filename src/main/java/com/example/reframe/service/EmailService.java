@@ -21,6 +21,10 @@ public class EmailService {
     @Value("${app.admin.email}")
     private String adminEmail;
 
+    // application.properties の値を注入
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy年M月d日");
 
     /**
@@ -53,7 +57,7 @@ public class EmailService {
         body.append("■ ご予約の確認・キャンセル\n");
         body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         body.append("ご予約内容の確認やキャンセルは、以下の専用URLから行っていただけます。\n");
-        body.append("http://localhost:8080/reservation/confirm?code=").append(reservation.getReservationCode()).append("\n\n");
+        body.append(baseUrl).append("/reservation/confirm?code=").append(reservation.getReservationCode());
 
         //場所
         body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");

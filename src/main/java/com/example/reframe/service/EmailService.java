@@ -57,7 +57,7 @@ public class EmailService {
         body.append("■ ご予約の確認・キャンセル\n");
         body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         body.append("ご予約内容の確認やキャンセルは、以下の専用URLから行っていただけます。\n");
-        body.append(baseUrl).append("/reservation/confirm?code=").append(reservation.getReservationCode());
+        body.append(baseUrl).append("/reservation/confirm?code=").append(reservation.getReservationCode() + "\n");
 
         //場所
         body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
